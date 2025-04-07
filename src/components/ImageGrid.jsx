@@ -5,13 +5,7 @@ export default function ImageGrid({ images }) {
   return (
     <div className="image-grid">
       {images.map((image) => (
-        <a
-          key={image.id}
-          href={`https://danbooru.donmai.us/posts/${image.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="image-link"
-        >
+        <div key={image.id} className="image-link">
           {image.file_ext === "mp4" ? (
             <video
               className="image-item"
@@ -36,7 +30,7 @@ export default function ImageGrid({ images }) {
               loading="lazy"
             />
           )}
-        </a>
+        </div>
       ))}
     </div>
   );
