@@ -8,6 +8,10 @@ import Pagination from "./components/Pagination";
 
 const PER_PAGE = 25;
 
+// ✅ Credenciales Danbooru
+const DANBOORU_USERNAME = "PancetaRadioactiva";
+const DANBOORU_API_KEY = "eQaQeXjdCXzpYRptSHy63cfL";
+
 export default function App() {
   const [tag, setTag] = useState("cute");
   const [images, setImages] = useState([]);
@@ -26,20 +30,32 @@ export default function App() {
     const formattedTag = formatTags(newTag);
     const encodedTag = encodeURIComponent(formattedTag);
 
+    const axiosConfig = {
+      auth: {
+        username: DANBOORU_USERNAME,
+        password: DANBOORU_API_KEY,
+      },
+    };
+
     try {
       const response = await axios.get(
-        `https://danbooru.donmai.us/posts.json?tags=${encodedTag}&limit=${PER_PAGE}&page=${newPage}`
+        `https://danbooru.donmai.us/posts.json?tags=${encodedTag}&limit=${PER_PAGE}&page=${newPage}`,
+        axiosConfig
       );
 
-      const media = response.data.filter((post) => post.file_url && ["jpg", "png", "gif", "mp4"].includes(post.file_ext));
+      const media = response.data.filter(
+        (post) => post.file_url && ["jpg", "png", "gif", "mp4"].includes(post.file_ext)
+      );
 
       if (media.length === 0) {
         const fallback = await axios.get(
-          `https://danbooru.donmai.us/posts.json?tags=rating%3Ae&limit=${PER_PAGE}&page=1`
+          `https://danbooru.donmai.us/posts.json?tags=rating%3Ae&limit=${PER_PAGE}&page=1`,
+          axiosConfig
         );
-        const fallbackMedia = fallback.data.filter((post) => post.file_url && ["jpg", "png", "gif", "mp4"].includes(post.file_ext));
+        const fallbackMedia = fallback.data.filter(
+          (post) => post.file_url && ["jpg", "png", "gif", "mp4"].includes(post.file_ext)
+        );
         setImages(fallbackMedia);
-        setError(false);
       } else {
         setImages(media);
       }
@@ -47,11 +63,13 @@ export default function App() {
       console.error("Error fetching images", err);
       try {
         const fallback = await axios.get(
-          `https://danbooru.donmai.us/posts.json?tags=rating%3Ae&limit=${PER_PAGE}&page=1`
+          `https://danbooru.donmai.us/posts.json?tags=rating%3Ae&limit=${PER_PAGE}&page=1`,
+          axiosConfig
         );
-        const fallbackMedia = fallback.data.filter((post) => post.file_url && ["jpg", "png", "gif", "mp4"].includes(post.file_ext));
+        const fallbackMedia = fallback.data.filter(
+          (post) => post.file_url && ["jpg", "png", "gif", "mp4"].includes(post.file_ext)
+        );
         setImages(fallbackMedia);
-        setError(false);
       } catch (fallbackErr) {
         console.error("Fallback also failed", fallbackErr);
         setImages([]);
